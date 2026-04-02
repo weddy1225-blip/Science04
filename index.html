@@ -12,7 +12,7 @@
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .note-card { background: #FFF9C4; border-radius: 15px; padding: 12px; text-align: left; margin-bottom: 15px; border: 2px dashed #FBC02D; font-size: 13px; }
         .order-sheet { background: #FAFAFA; border: 2px solid #DEB887; border-radius: 15px; padding: 18px; margin-bottom: 15px; text-align: left; min-height: 85px; position: relative; }
-        .btn-primary { background: #4CAF50; color: white; border: none; width: 100%; padding: 16px; font-size: 19px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px #2E7D32; margin-bottom: 10px; }
+        .btn-primary { background: #4CAF50; color: white; border: none; width: 100%; padding: 16px; font-size: 19px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px #2E7D32; margin-bottom: 10px; outline: none; }
         .btn-primary:disabled { background: #BDC3C7; box-shadow: 0 4px #95A5A6; cursor: not-allowed; opacity: 0.8; }
         .btn-boss { background: #E91E63; box-shadow: 0 4px #AD1457; }
         .btn-skip { background: #90A4AE; box-shadow: 0 4px #546E7A; }
@@ -33,49 +33,48 @@
         </div>
 
         <div id="game-screen">
-            <div class="note-card">💡 <b>隨身筆記：</b> 電池串聯增壓、並聯持久；燈泡並聯最亮、串聯柔光。</div>
+            <div class="note-card">💡 <b>老闆隨身筆記：</b><br>● 電池並聯：體力變久 | ● 電池串聯：力量變強<br>● 燈泡並聯：各自亮亮 | ● 燈泡串聯：分電變暗</div>
             <div class="order-sheet"><b id="cName"></b><p id="cDesc"></p></div>
             <div style="text-align:left; background:#F5F5F5; padding:15px; border-radius:15px; margin-bottom:15px;">
-                電池配置：<select id="bat" style="width:100%; padding:10px; margin-bottom:10px;"><option value="串聯">串聯「加強力量」</option><option value="並聯">並聯「持久續航」</option></select>
-                燈泡配置：<select id="bul" style="width:100%; padding:10px;"><option value="串聯">串聯「分電柔光」</option><option value="並聯">並聯「獨立發光」</option></select>
+                電池接法：<select id="bat" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;"><option value="串聯">串聯「一條龍」</option><option value="並聯">並聯「排排站」</option></select>
+                燈泡接法：<select id="bul" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc;"><option value="串聯">串聯「分著用」</option><option value="並聯">並聯「自己用」</option></select>
             </div>
             <button id="mainBtn" class="btn-primary" onclick="goWork()">確認派工！</button>
             <div id="feedback">
                 <span id="starOutput" style="font-size: 30px;"></span>
                 <p id="msgOutput" style="font-weight:bold;"></p>
-                <button id="nextBtn" class="btn-primary" style="background:#8B4513;" onclick="nextStep()">接待下一位 ➔</button>
+                <button id="nextBtn" class="btn-primary" style="background:#8B4513;" onclick="nextStep()">下一位客人 ➔</button>
             </div>
         </div>
 
         <div id="boss-ask-screen">
             <div style="font-size: 50px;">🔥</div>
             <h2>隱藏挑戰出現！</h2>
-            <p style="background:#FFF3E0; padding:15px; border-radius:15px;">有個大客戶「超級歌手」指名要老闆親自處理演唱會電路，這題非常難，要挑戰嗎？</p>
+            <p style="background:#FFF3E0; padding:15px; border-radius:15px;">有個大客戶「超級歌手」指名要老闆處理演唱會電路，這題非常難，要挑戰嗎？</p>
             <button class="btn-primary btn-boss" onclick="startBoss()">🔥 接受挑戰 (魔王關)</button>
             <button class="btn-primary btn-skip" onclick="showEnd()">直接收工結算</button>
         </div>
 
         <div id="end-screen">
-            <div id="finalIcon" style="font-size: 55px;">🛠️</div>
+            <div style="font-size: 55px;">🏆</div>
             <h2 id="finalRank"></h2>
+            <p>本次維修任務的邏輯回顧：</p>
             <div id="reviewList" class="review-card"></div>
             <button class="btn-primary" style="background:#546E7A;" onclick="location.reload()">重新開張</button>
         </div>
     </div>
 
     <script>
-        // 1. 資料庫直接寫在 JavaScript 裡
+        // 1. 完整題庫資料
         const missionDb = {
-            "阿嬤的鬧鐘": { logic: "電池並聯：體力變持久。", win: "「太專業了！」王阿嬤送你一包茶葉！", lose: "「老闆...鬧鐘兩天就停了。」", target: { bat: "並聯" } },
-            "小明的賽車": { logic: "電池串聯：疊加力量爆發速度。", win: "「衝啊！」小明拿了第一名！", lose: "「老闆，這速度慢死了...」", target: { bat: "串聯" } },
-            "陳伯伯": { logic: "燈泡並聯：互不干擾，壞一顆也亮。", win: "「太安心了！」壞了一顆還能繼續看報。", lose: "「一顆燈壞全家黑，差點絆倒。」", target: { bul: "並聯" } },
-            "林阿姨": { logic: "燈泡串聯：分電讓光線柔和。", win: "「就是這個光！」溫馨又不刺眼。", lose: "「太亮了！眼睛快瞎了。」", target: { bul: "串聯" } },
-            "露營客": { logic: "電池並聯：增加營地燈續航力。", win: "「專業！」燈亮了三天三夜！", lose: "「老闆，第一晚就沒電了。」", target: { bat: "並聯" } },
-            "警衛大叔": { logic: "電池串聯：讓手電筒射得超遠。", win: "「太亮了！」連小貓都看得到。", lose: "「老闆，這光照不到十步遠。」", target: { bat: "串聯" } },
-            "聖誕小精靈": { logic: "燈泡並聯：壞一顆不全滅。", win: "「聖誕節得救了！」整棵樹閃亮亮。", lose: "「老闆，一顆不亮全線陣亡。」", target: { bul: "並聯" } },
-            "科展同學": { logic: "燈泡串聯：實驗分壓原理。", win: "「報告拿高分！」正確觀察到變暗。", lose: "「接法錯了，結果不一樣。」", target: { bul: "串聯" } },
-            "外送員阿強": { logic: "電池並聯：亮整晚跑單。", win: "「謝啦老闆！」跑宵夜場超放心。", lose: "「老闆，跑一半燈就熄了。」", target: { bat: "並聯" } },
-            "演唱會歌手": { logic: "最強組合：電池串聯(增壓) + 燈泡並聯(最強亮度)。", win: "「震撼全場！」老闆太強了！", middle: "「還可以，但技術能再精進？」", lose: "「這燈光微弱到像在過清明節？」", target: { bat: "串聯", bul: "並聯" } }
+            "阿嬤的鬧鐘": { logic: "電池並聯：增加總電量，讓鬧鐘跑更久。", win: "「太專業了！」王阿嬤送你一包茶葉！", lose: "「老闆...鬧鐘兩天就停了。」", target: { bat: "並聯" } },
+            "小明的賽車": { logic: "電池串聯：疊加電壓，爆發出最強動力。", win: "「衝啊！」小明拿了第一名！", lose: "「老闆，這速度慢死了...」", target: { bat: "串聯" } },
+            "陳伯伯": { logic: "燈泡並聯：各路徑獨立，壞一顆另一顆仍亮。", win: "「太安心了！」壞了一顆還能繼續看報。", lose: "「一顆燈壞全家黑，我差點絆倒。」", target: { bul: "並聯" } },
+            "林阿姨": { logic: "燈泡串聯：平分電壓，讓光線變柔和、不刺眼。", win: "「就是這個光！」溫馨又不刺眼。", lose: "「太亮了！眼睛快瞎了。」", target: { bul: "串聯" } },
+            "外送員阿強": { logic: "電池並聯：持久接法，確保外送箱燈亮整晚。", win: "「謝啦老闆！」跑宵夜場超放心。", lose: "「老闆，跑一半燈就熄了。」", target: { bat: "並聯" } },
+            "警衛大叔": { logic: "電池串聯：提高電壓讓手電筒射得更遠。", win: "「太亮了！」連小貓都看得到。", lose: "「老闆，這光照不到十步遠。」", target: { bat: "串聯" } },
+            "聖誕小精靈": { logic: "燈泡並聯：裝飾燈串獨立供電，不怕斷路。", win: "「聖誕節得救了！」整棵樹閃亮亮。", lose: "「老闆，一顆不亮全線陣亡。」", target: { bul: "並聯" } },
+            "演唱會歌手": { logic: "最強組合：電池串聯(增壓) + 燈泡並聯(最強亮度)。", win: "「震撼全場！」最強光芒讓觀眾瘋狂！", middle: "「還可以，但總覺得老闆還能再精進？」", lose: "「這燈光微弱到像在過清明節？」", target: { bat: "串聯", bul: "並聯" } }
         };
 
         const allClients = [
@@ -83,16 +82,15 @@
             { id: "小明的賽車", name: "頑皮小明", desc: "「我的賽車速度慢死了，給我最強爆發力！」" },
             { id: "陳伯伯", name: "陳伯伯", desc: "「裝兩顆燈泡，其中一顆壞掉另一顆不能熄！」" },
             { id: "林阿姨", name: "林阿姨", desc: "「走廊燈太刺眼，能不能讓光線柔和一點？」" },
-            { id: "露營客", name: "露營客小張", desc: "「露營燈要撐好幾天，持久接法拜託了！」" },
-            { id: "警衛大叔", name: "警衛大叔", desc: "「手電筒要射超遠，加強電力！」" },
-            { id: "聖誕小精靈", name: "小精靈", desc: "「燈串要獨立亮著，壞一顆不能全滅！」" },
-            { id: "科展同學", name: "科展同學", desc: "「我想讓兩顆燈泡平分電壓變暗。」" },
-            { id: "外送員阿強", name: "阿強", desc: "「燈箱要亮一整晚跑單，請用持久接法。」" }
+            { id: "外送員阿強", name: "外送員阿強", desc: "「外送箱的燈要亮很久，請幫我用最持久的接法！」" },
+            { id: "警衛大叔", name: "警衛大叔", desc: "「巡邏手電筒要射超遠，幫我加強電力！」" },
+            { id: "聖誕小精靈", name: "小精靈", desc: "「聖誕樹燈泡要獨立，壞一顆不能全滅！」" }
         ];
 
         let clients = [], currentIdx = 0, score = 0, gameLog = [], isBossLevel = false;
 
         function startGame() {
+            // 隨機抽選 3 位客人
             clients = allClients.sort(() => 0.5 - Math.random()).slice(0, 3);
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
@@ -101,52 +99,51 @@
 
         function loadClient() {
             const c = clients[currentIdx];
-            document.getElementById('cName').innerText = "報修客戶：" + c.name;
+            document.getElementById('cName').innerText = "報修單：" + c.name;
             document.getElementById('cDesc').innerText = c.desc;
             document.getElementById('feedback').style.display = 'none';
             document.getElementById('mainBtn').disabled = false;
             document.getElementById('mainBtn').innerText = "確認派工！";
         }
 
-        // 核心邏輯判斷函式 (原本在後端，現在改寫到前端)
-        function checkAnswer(missionId, batVal, bulVal) {
-            const m = missionDb[missionId];
-            let success = false, star = "⭐", text = "";
-
-            if (missionId === "演唱會歌手") {
-                if (batVal === m.target.bat && bulVal === m.target.bul) { success = true; text = m.win; star = "⭐⭐⭐"; }
-                else if (batVal === m.target.bat || bulVal === m.target.bul) { text = m.middle; star = "⭐⭐"; }
-                else { text = m.lose; star = "⭐"; }
-            } else {
-                const batOk = m.target.bat ? (batVal === m.target.bat) : true;
-                const bulOk = m.target.bul ? (bulVal === m.target.bul) : true;
-                if (batOk && bulOk) { success = true; text = m.win; star = "⭐⭐⭐"; }
-                else { text = m.lose; star = "⭐"; }
-            }
-            return { success, text, rank: star, logic: m.logic };
-        }
-
         function goWork() {
-            const mainBtn = document.getElementById('mainBtn');
-            mainBtn.disabled = true;
-            mainBtn.innerText = "工程處理中...";
+            const batVal = document.getElementById('bat').value;
+            const bulVal = document.getElementById('bul').value;
+            const currentId = clients[currentIdx].id;
+            const m = missionDb[currentId];
             
-            // 模擬延遲，增加真實感
+            document.getElementById('mainBtn').disabled = true;
+            document.getElementById('mainBtn').innerText = "工程處理中...";
+
+            // 模擬電路測試時間
             setTimeout(() => {
-                const res = checkAnswer(clients[currentIdx].id, document.getElementById('bat').value, document.getElementById('bul').value);
-                if(res.success) score++;
-                gameLog.push({ name: clients[currentIdx].name, logic: res.logic, perfect: res.success });
-                
-                document.getElementById('starOutput').innerText = res.rank;
-                document.getElementById('msgOutput').innerText = res.text;
+                let isSuccess = false, star = "⭐", responseText = "";
+
+                if (currentId === "演唱會歌手") {
+                    if (batVal === m.target.bat && bulVal === m.target.bul) { isSuccess = true; responseText = m.win; star = "⭐⭐⭐"; }
+                    else if (batVal === m.target.bat || bulVal === m.target.bul) { responseText = m.middle; star = "⭐⭐"; }
+                    else { responseText = m.lose; star = "⭐"; }
+                } else {
+                    const isBatOk = m.target.bat ? (batVal === m.target.bat) : true;
+                    const isBulOk = m.target.bul ? (bulVal === m.target.bul) : true;
+                    if (isBatOk && isBulOk) { isSuccess = true; responseText = m.win; star = "⭐⭐⭐"; }
+                    else { responseText = m.lose; star = "⭐"; }
+                }
+
+                if(isSuccess) score++;
+                gameLog.push({ name: clients[currentIdx].name, logic: m.logic, perfect: isSuccess });
+
+                document.getElementById('starOutput').innerText = star;
+                document.getElementById('msgOutput').innerText = responseText;
                 document.getElementById('feedback').style.display = 'block';
             }, 800);
         }
 
         function nextStep() {
             if (isBossLevel) { showEnd(); return; }
-            if (currentIdx < 2) { 
-                currentIdx++; loadClient(); 
+            if (currentIdx < 2) {
+                currentIdx++;
+                loadClient();
             } else {
                 document.getElementById('game-screen').style.display = 'none';
                 document.getElementById('boss-ask-screen').style.display = 'block';
@@ -159,7 +156,7 @@
             currentIdx = 3;
             document.getElementById('boss-ask-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
-            document.getElementById('nextBtn').innerText = "查看最終結算 ➔";
+            document.getElementById('nextBtn').innerText = "看今日營業結算 ➔";
             loadClient();
         }
 
@@ -168,15 +165,15 @@
             document.getElementById('boss-ask-screen').style.display = 'none';
             document.getElementById('end-screen').style.display = 'block';
             
-            let rank = "技術待加強";
-            if(score >= 4) rank = "✨ 技術超強，大家稱讚不已 ✨";
-            else if(score >= 2) rank = "👍 偶有小失誤，但還不錯";
+            let rank = "熱血水電學徒";
+            if(score >= 4) rank = "🏆 閃電水電神之手";
+            else if(score >= 2) rank = "🥈 資深維修師傅";
             
             document.getElementById('finalRank').innerText = rank;
             let html = "";
             gameLog.forEach(item => {
-                const tag = item.perfect ? '<span class="perfect-tag">完美！</span>' : '<span class="perfect-tag" style="background:#FFEBEE;color:#C62828;">加油</span>';
-                html += `<div class="review-item"><b>${item.name}：</b><br>${tag}${item.logic}</div>`;
+                const tag = item.perfect ? '<span class="perfect-tag">維修成功</span>' : '<span class="perfect-tag" style="background:#FFEBEE;color:#C62828;">維修失誤</span>';
+                html += `<div class="review-item">● <b>${item.name}：</b><br>${item.logic}</div>`;
             });
             document.getElementById('reviewList').innerHTML = html;
         }
