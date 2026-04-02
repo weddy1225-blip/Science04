@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: "Microsoft JhengHei", sans-serif; background-color: #FDF5E6; text-align: center; padding: 15px; color: #333; margin: 0; }
+      .shop-container { background: #FFFFFF; border-radius: 25px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 420px; margin: 20px auto; border: 4px solid #8B4513; }
+      #game-screen, #boss-ask-screen, #end-screen { display: none; }
+      .welcome-tag { background: #FF7043; color: white; padding: 5px 18px; border-radius: 20px; font-weight: bold; display: inline-block; animation: bounce 2s infinite; margin-bottom: 10px; }
+      @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+      .note-card { background: #FFF9C4; border-radius: 15px; padding: 12px; text-align: left; margin-bottom: 15px; border: 2px dashed #FBC02D; font-size: 13px; }
+      .order-sheet { background: #FAFAFA; border: 2px solid #DEB887; border-radius: 15px; padding: 18px; margin-bottom: 15px; text-align: left; min-height: 85px; position: relative; }
+      .btn-primary { background: #4CAF50; color: white; border: none; width: 100%; padding: 16px; font-size: 19px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px #2E7D32; margin-bottom: 10px; }
+      .btn-primary:disabled { background: #BDC3C7; box-shadow: 0 4px #95A5A6; cursor: not-allowed; opacity: 0.8; }
+      .btn-boss { background: #E91E63; box-shadow: 0 4px #AD1457; }
+      .btn-skip { background: #90A4AE; box-shadow: 0 4px #546E7A; }
+      #feedback { margin-top: 15px; display: none; padding: 15px; border-radius: 15px; border: 2px solid #EEE; }
+      .review-card { background: #F1F8E9; border-radius: 15px; padding: 15px; text-align: left; margin-top: 15px; border: 1px solid #C8E6C9; }
+      .review-item { margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #E8F5E9; padding-bottom: 8px; }
+      .perfect-tag { color: #2E7D32; font-weight: bold; background: #C8E6C9; padding: 3px 8px; border-radius: 6px; font-size: 11px; margin-right: 5px; }
+    </style>
+  </head>
+  <body>
+    <div class="shop-container">
+      
+      <div id="start-screen">
+        <div class="welcome-tag">🔔 老闆好！新報修單來了</div>
+        <h2 style="color: #8B4513;">⚡ 閃電水電行 ⚡</h2>
+        <p>今日有 3 位預約客戶，請準備營業！</p>
+        <button class="btn-primary" onclick="startGame()">➔ 開始營業</button>
+      </div>
+
+      <div id="game-screen">
+        <div class="note-card">💡 <b>隨身筆記：</b> 電池串聯增壓、並聯持久；燈泡並聯最亮、串聯柔光。</div>
+        <div class="order-sheet"><b id="cName"></b><p id="cDesc"></p></div>
+        <div style="text-align:left; background:#F5F5F5; padding:15px; border-radius:15px; margin-bottom:15px;">
+          電池：<select id="bat" style="width:100%; padding:10px; margin-bottom:10px;"><option value="串聯">串聯「加強力量」</option><option value="並聯">並聯「持久續航」</option></select>
+          燈泡：<select id="bul" style="width:100%; padding:10px;"><option value="串聯">串聯「分電柔光」</option><option value="並聯">並聯「獨立發光」</option></select>
+        </div>
+        <button id="mainBtn" class="btn-primary" onclick="goWork()">確認派工！</button>
+        <div id="feedback">
+          <span id="starOutput" style="font-size: 30px;"></span>
+          <p id="msgOutput" style="font-weight:bold;"></p>
+          <button id="nextBtn" class="btn-primary" style="background:#8B4513;" onclick="nextStep()">接待下一位 ➔</button>
+        </div>
+      </div>
+
+      <div id="boss-ask-screen">
+        <div style="font-size: 50px;">🔥</div>
+        <h2>隱藏挑戰出現！</h2>
+        <p style="background:#FFF3E0; padding:15px; border-radius:15px;">有個大客戶「超級歌手」指名要老闆親自處理演唱會電路，這題非常難，要挑戰嗎？</p>
+        <button class="btn-primary btn-boss" onclick="startBoss()">🔥 接受挑戰 (魔王關)</button>
+        <button class="btn-primary btn-skip" onclick="showEnd()">直接收工結算</button>
+      </div>
+
+      <div id="end-screen">
+        <div id="finalIcon" style="font-size: 55px;">🛠️</div>
+        <h2 id="finalRank"></h2>
+        <div id="reviewList" class="review-card"></div>
+        <button class="btn-primary" style="background:#546E7A;" onclick="location.reload()">明天繼續營業</button>
+      </div>
+
+    </div>
+
+    <script>
+      const allClients = [
+        { id: "阿嬤的鬧鐘", name: "王阿嬤", desc: "「鬧鐘電池很快就沒電，幫我撐久一點！」" },
+        { id: "小明的賽車", name: "頑皮小明", desc: "「我的賽車速度慢死了，給我最強爆發力！」" },
+        { id: "陳伯伯", name: "陳伯伯", desc: "「裝兩顆燈泡，其中一顆壞掉另一顆不能熄！」" },
+        { id: "林阿姨", name: "林阿姨", desc: "「走廊燈太刺眼，能不能讓光線柔和一點？」" },
+        { id: "露營客", name: "露營客小張", desc: "「露營燈要撐好幾天，持久接法拜託了！」" },
+        { id: "警衛大叔", name: "警衛大叔", desc: "「手電筒要射超遠，加強電力！」" },
+        { id: "聖誕小精靈", name: "小精靈", desc: "「燈串要獨立亮著，壞一顆不能全滅！」" },
+        { id: "科展同學", name: "科展同學", desc: "「我想讓兩顆燈泡平分電壓變暗。」" },
+        { id: "外送員阿強", name: "阿強", desc: "「燈箱要亮一整晚跑單，請用持久接法。」" }
+      ];
+      
+      let clients = [], currentIdx = 0, score = 0, gameLog = [], isBossLevel = false;
+
+      function startGame() {
+        // 隨機抽3題
+        clients = allClients.sort(() => 0.5 - Math.random()).slice(0, 3);
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        loadClient();
+      }
+
+      function loadClient() {
+        const c = clients[currentIdx];
+        document.getElementById('cName').innerText = "報修客戶：" + c.name;
+        document.getElementById('cDesc').innerText = c.desc;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('mainBtn').disabled = false;
+        document.getElementById('mainBtn').innerText = "確認派工！";
+      }
+
+      function goWork() {
+        const mainBtn = document.getElementById('mainBtn');
+        mainBtn.disabled = true;
+        mainBtn.innerText = "工程處理中...";
+        
+        google.script.run.withSuccessHandler(res => {
+          if(res.success) score++;
+          gameLog.push({ name: clients[currentIdx].name, logic: res.logic, perfect: res.success });
+          document.getElementById('starOutput').innerText = res.rank;
+          document.getElementById('msgOutput').innerText = res.text;
+          document.getElementById('feedback').style.display = 'block';
+        }).solveProblem(clients[currentIdx].id, document.getElementById('bat').value, document.getElementById('bul').value);
+      }
+
+      function nextStep() {
+        if (isBossLevel) { showEnd(); return; } // 魔王打完直接結算
+        
+        if (currentIdx < 2) { 
+          currentIdx++; 
+          loadClient(); 
+        } else {
+          // 3題一般題打完，問要不要打魔王
+          document.getElementById('game-screen').style.display = 'none';
+          document.getElementById('boss-ask-screen').style.display = 'block';
+        }
+      }
+
+      function startBoss() {
+        isBossLevel = true;
+        clients.push({ id: "演唱會歌手", name: "隱藏魔王：演唱會歌手", desc: "「我要最強電壓搭配燈泡最高亮度，震撼全場！」" });
+        currentIdx = 3;
+        document.getElementById('boss-ask-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('nextBtn').innerText = "查看最終結算 ➔";
+        loadClient();
+      }
+
+      function showEnd() {
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('boss-ask-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        
+        let rank = "技術待加強";
+        if(score >= 4) rank = "✨ 技術超強，大家稱讚不已 ✨";
+        else if(score >= 2) rank = "👍 偶有小失誤，但還不錯";
+        
+        document.getElementById('finalRank').innerText = rank;
+        let html = "";
+        gameLog.forEach(item => {
+          const tag = item.perfect ? '<span class="perfect-tag">完美！</span>' : '<span class="perfect-tag" style="background:#FFEBEE;color:#C62828;">加油</span>';
+          html += `<div class="review-item"><b>${item.name}：</b><br>${tag}${item.logic}</div>`;
+        });
+        document.getElementById('reviewList').innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
