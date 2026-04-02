@@ -36,8 +36,14 @@
             <div class="note-card">💡 <b>老闆隨身筆記：</b><br>● 電池並聯：體力變久 | ● 電池串聯：力量變強<br>● 燈泡並聯：各自亮亮 | ● 燈泡串聯：分電變暗</div>
             <div class="order-sheet"><b id="cName"></b><p id="cDesc"></p></div>
             <div style="text-align:left; background:#F5F5F5; padding:15px; border-radius:15px; margin-bottom:15px;">
-                電池接法：<select id="bat" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;"><option value="串聯">串聯「一條龍」</option><option value="並聯">並聯「排排站」</option></select>
-                燈泡接法：<select id="bul" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc;"><option value="串聯">串聯「分著用」</option><option value="並聯">並聯「自己用」</option></select>
+                電池接法：<select id="bat" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;">
+                    <option value="串聯">串聯「一條龍」</option>
+                    <option value="並聯">並聯「排排站」</option>
+                </select>
+                燈泡接法：<select id="bul" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc;">
+                    <option value="串聯">串聯「分著用」</option>
+                    <option value="並聯">並聯「自己用」</option>
+                </select>
             </div>
             <button id="mainBtn" class="btn-primary" onclick="goWork()">確認派工！</button>
             <div id="feedback">
@@ -50,7 +56,7 @@
         <div id="boss-ask-screen">
             <div style="font-size: 50px;">🔥</div>
             <h2>隱藏挑戰出現！</h2>
-            <p style="background:#FFF3E0; padding:15px; border-radius:15px;">有個大客戶「超級歌手」指名要老闆處理演唱會電路，這題非常難，要挑戰嗎？</p>
+            <p style="background:#FFF3E0; padding:15px; border-radius:15px;">有個大客戶「超級歌手」指名要老闆處理演唱會電路，要挑戰嗎？</p>
             <button class="btn-primary btn-boss" onclick="startBoss()">🔥 接受挑戰 (魔王關)</button>
             <button class="btn-primary btn-skip" onclick="showEnd()">直接收工結算</button>
         </div>
@@ -58,23 +64,23 @@
         <div id="end-screen">
             <div style="font-size: 55px;">🏆</div>
             <h2 id="finalRank"></h2>
-            <p>本次維修任務的邏輯回顧：</p>
+            <p>今日營業回顧：</p>
             <div id="reviewList" class="review-card"></div>
             <button class="btn-primary" style="background:#546E7A;" onclick="location.reload()">重新開張</button>
         </div>
     </div>
 
     <script>
-        // 1. 完整題庫資料
+        // 核心邏輯資料庫
         const missionDb = {
-            "阿嬤的鬧鐘": { logic: "電池並聯：增加總電量，讓鬧鐘跑更久。", win: "「太專業了！」王阿嬤送你一包茶葉！", lose: "「老闆...鬧鐘兩天就停了。」", target: { bat: "並聯" } },
-            "小明的賽車": { logic: "電池串聯：疊加電壓，爆發出最強動力。", win: "「衝啊！」小明拿了第一名！", lose: "「老闆，這速度慢死了...」", target: { bat: "串聯" } },
-            "陳伯伯": { logic: "燈泡並聯：各路徑獨立，壞一顆另一顆仍亮。", win: "「太安心了！」壞了一顆還能繼續看報。", lose: "「一顆燈壞全家黑，我差點絆倒。」", target: { bul: "並聯" } },
-            "林阿姨": { logic: "燈泡串聯：平分電壓，讓光線變柔和、不刺眼。", win: "「就是這個光！」溫馨又不刺眼。", lose: "「太亮了！眼睛快瞎了。」", target: { bul: "串聯" } },
-            "外送員阿強": { logic: "電池並聯：持久接法，確保外送箱燈亮整晚。", win: "「謝啦老闆！」跑宵夜場超放心。", lose: "「老闆，跑一半燈就熄了。」", target: { bat: "並聯" } },
-            "警衛大叔": { logic: "電池串聯：提高電壓讓手電筒射得更遠。", win: "「太亮了！」連小貓都看得到。", lose: "「老闆，這光照不到十步遠。」", target: { bat: "串聯" } },
-            "聖誕小精靈": { logic: "燈泡並聯：裝飾燈串獨立供電，不怕斷路。", win: "「聖誕節得救了！」整棵樹閃亮亮。", lose: "「老闆，一顆不亮全線陣亡。」", target: { bul: "並聯" } },
-            "演唱會歌手": { logic: "最強組合：電池串聯(增壓) + 燈泡並聯(最強亮度)。", win: "「震撼全場！」最強光芒讓觀眾瘋狂！", middle: "「還可以，但總覺得老闆還能再精進？」", lose: "「這燈光微弱到像在過清明節？」", target: { bat: "串聯", bul: "並聯" } }
+            "阿嬤的鬧鐘": { logic: "電池並聯：增加總電量，跑更久。", target: { bat: "並聯" }, win: "「太專業了！」王阿嬤送你一包茶葉！", lose: "「老闆...鬧鐘兩天就停了。」" },
+            "小明的賽車": { logic: "電池串聯：疊加電壓，速度最快。", target: { bat: "串聯" }, win: "「衝啊！」小明拿了第一名！", lose: "「老闆，這速度慢死了...」" },
+            "陳伯伯": { logic: "燈泡並聯：各路徑獨立，不怕斷路。", target: { bul: "並聯" }, win: "「太安心了！」壞一顆另一顆仍亮。", lose: "「一顆燈壞全家黑，我差點絆倒。」" },
+            "林阿姨": { logic: "燈泡串聯：平分電壓，光線變柔和。", target: { bul: "串聯" }, win: "「就是這個光！」溫馨不刺眼。", lose: "「太亮了！眼睛快瞎了。」" },
+            "外送員阿強": { logic: "電池並聯：持久接法，亮整晚跑單。", target: { bat: "並聯" }, win: "「謝啦老闆！」跑宵夜場超放心。", lose: "「老闆，跑一半燈就熄了。」" },
+            "警衛大叔": { logic: "電池串聯：提高電壓讓光射更遠。", target: { bat: "串聯" }, win: "「太亮了！」連小貓都看得到。", lose: "「老闆，這光照不到十步遠。」" },
+            "科展同學": { logic: "燈泡串聯：分電變暗，符合實驗觀察。", target: { bul: "串聯" }, win: "「報告拿高分！」實驗結果非常正確。", lose: "「老闆，這亮度跟並聯一樣強？」" },
+            "演唱會歌手": { logic: "最強組合：電池串聯(增壓) + 燈泡並聯(最強亮度)。", target: { bat: "串聯", bul: "並聯" }, win: "「震撼全場！」最強光芒讓觀眾瘋狂！", middle: "「還可以，但總覺得能再精進？」", lose: "「這燈光微弱到像在過清明節？」" }
         };
 
         const allClients = [
@@ -84,13 +90,12 @@
             { id: "林阿姨", name: "林阿姨", desc: "「走廊燈太刺眼，能不能讓光線柔和一點？」" },
             { id: "外送員阿強", name: "外送員阿強", desc: "「外送箱的燈要亮很久，請幫我用最持久的接法！」" },
             { id: "警衛大叔", name: "警衛大叔", desc: "「巡邏手電筒要射超遠，幫我加強電力！」" },
-            { id: "聖誕小精靈", name: "小精靈", desc: "「聖誕樹燈泡要獨立，壞一顆不能全滅！」" }
+            { id: "科展同學", name: "科展同學", desc: "「我想讓兩顆燈泡平分電壓變暗。」" }
         ];
 
         let clients = [], currentIdx = 0, score = 0, gameLog = [], isBossLevel = false;
 
         function startGame() {
-            // 隨機抽選 3 位客人
             clients = allClients.sort(() => 0.5 - Math.random()).slice(0, 3);
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
@@ -106,6 +111,7 @@
             document.getElementById('mainBtn').innerText = "確認派工！";
         }
 
+        // 修正原本導致錯誤的 goWork 函式，現在不呼叫 google.script.run
         function goWork() {
             const batVal = document.getElementById('bat').value;
             const bulVal = document.getElementById('bul').value;
@@ -115,7 +121,6 @@
             document.getElementById('mainBtn').disabled = true;
             document.getElementById('mainBtn').innerText = "工程處理中...";
 
-            // 模擬電路測試時間
             setTimeout(() => {
                 let isSuccess = false, star = "⭐", responseText = "";
 
@@ -156,7 +161,7 @@
             currentIdx = 3;
             document.getElementById('boss-ask-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
-            document.getElementById('nextBtn').innerText = "看今日營業結算 ➔";
+            document.getElementById('nextBtn').innerText = "看結算回顧 ➔";
             loadClient();
         }
 
@@ -167,13 +172,13 @@
             
             let rank = "熱血水電學徒";
             if(score >= 4) rank = "🏆 閃電水電神之手";
-            else if(score >= 2) rank = "🥈 資深維修師傅";
+            else if(score >= 2) rank = "🥈 資深維修大師";
             
             document.getElementById('finalRank').innerText = rank;
             let html = "";
             gameLog.forEach(item => {
-                const tag = item.perfect ? '<span class="perfect-tag">維修成功</span>' : '<span class="perfect-tag" style="background:#FFEBEE;color:#C62828;">維修失誤</span>';
-                html += `<div class="review-item">● <b>${item.name}：</b><br>${item.logic}</div>`;
+                const status = item.perfect ? "✅" : "❌";
+                html += `<div class="review-item">${status} <b>${item.name}：</b><br>${item.logic}</div>`;
             });
             document.getElementById('reviewList').innerHTML = html;
         }
