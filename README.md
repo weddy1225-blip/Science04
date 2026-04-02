@@ -10,7 +10,7 @@
 ## 🎮 立即體驗
 點擊下方連結，立即開啟你的水電行經營之旅：
 
-### 👉 [點擊開始遊戲 (Play Now)](這裡請替換成你的GoogleAppsScript部署網址)
+### 👉 [點擊開始遊戲 (Play Now)](https://weddy1225-blip.github.io/Science04/)
 
 ---
 
