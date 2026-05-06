@@ -3,60 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ 閃電水電行 ⚡</title>
+    <title>⚡ 閃電水電行：傳統燈泡專修店 ⚡</title>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #FDF5E6; text-align: center; padding: 15px; color: #333; margin: 0; }
-        .shop-container { background: #FFFFFF; border-radius: 25px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 420px; margin: 20px auto; border: 4px solid #8B4513; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #FFF8E1; text-align: center; padding: 15px; color: #333; margin: 0; }
+        .shop-container { background: #FFFFFF; border-radius: 25px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 420px; margin: 20px auto; border: 4px solid #5D4037; }
         #game-screen, #boss-ask-screen, #end-screen { display: none; }
-        .welcome-tag { background: #FF7043; color: white; padding: 5px 18px; border-radius: 20px; font-weight: bold; display: inline-block; animation: bounce 2s infinite; margin-bottom: 10px; }
+        .welcome-tag { background: #FB8C00; color: white; padding: 5px 18px; border-radius: 20px; font-weight: bold; display: inline-block; animation: bounce 2s infinite; margin-bottom: 10px; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .note-card { background: #FFF9C4; border-radius: 15px; padding: 12px; text-align: left; margin-bottom: 15px; border: 2px dashed #FBC02D; font-size: 13px; }
-        .order-sheet { background: #FAFAFA; border: 2px solid #DEB887; border-radius: 15px; padding: 18px; margin-bottom: 15px; text-align: left; min-height: 85px; position: relative; }
-        .btn-primary { background: #4CAF50; color: white; border: none; width: 100%; padding: 16px; font-size: 19px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px #2E7D32; margin-bottom: 10px; outline: none; }
+        
+        /* 筆記卡片：優化對齊樣式 */
+        .note-card { 
+            background: #FFF9C4; 
+            border-radius: 15px; 
+            padding: 15px; 
+            text-align: left; 
+            margin-bottom: 15px; 
+            border: 2px dashed #FBC02D; 
+            font-size: 13px; 
+            color: #795548; 
+        }
+        .note-title { margin-bottom: 8px; display: block; font-weight: bold; }
+        .note-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* 分為左右兩欄 */
+            gap: 8px 10px; /* 上下左右間距 */
+        }
+        .note-item { display: flex; align-items: flex-start; }
+        .note-dot { color: #8D6E63; margin-right: 5px; flex-shrink: 0; }
+
+        .order-sheet { background: #FAFAFA; border: 2px solid #D7CCC8; border-radius: 15px; padding: 18px; margin-bottom: 15px; text-align: left; min-height: 85px; position: relative; }
+        .btn-primary { background: #43A047; color: white; border: none; width: 100%; padding: 16px; font-size: 19px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px #2E7D32; margin-bottom: 10px; outline: none; transition: 0.2s; }
+        .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px #2E7D32; }
         .btn-primary:disabled { background: #BDC3C7; box-shadow: 0 4px #95A5A6; cursor: not-allowed; opacity: 0.8; }
-        .btn-boss { background: #E91E63; box-shadow: 0 4px #AD1457; }
-        .btn-skip { background: #90A4AE; box-shadow: 0 4px #546E7A; }
-        #feedback { margin-top: 15px; display: none; padding: 15px; border-radius: 15px; border: 2px solid #EEE; }
+        .btn-boss { background: #E53935; box-shadow: 0 4px #B71C1C; }
+        .btn-skip { background: #78909C; box-shadow: 0 4px #455A64; }
+        
+        #feedback { margin-top: 15px; display: none; padding: 15px; border-radius: 15px; background: #FFF3E0; border: 2px solid #FFE0B2; }
         .review-card { background: #F1F8E9; border-radius: 15px; padding: 15px; text-align: left; margin-top: 15px; border: 1px solid #C8E6C9; }
         .review-item { margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #E8F5E9; padding-bottom: 8px; }
-        .perfect-tag { color: #2E7D32; font-weight: bold; background: #C8E6C9; padding: 3px 8px; border-radius: 6px; font-size: 11px; margin-right: 5px; }
+        
+        select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 2px solid #D7CCC8; background: white; font-size: 16px; }
+        b { color: #5D4037; }
     </style>
 </head>
 <body>
     <div class="shop-container">
-        
+        <!-- 開始畫面 -->
         <div id="start-screen">
-            <div class="welcome-tag">🔔 老闆好！新報修單來了</div>
-            <h2 style="color: #8B4513;">⚡ 閃電水電行 ⚡</h2>
+            <div class="welcome-tag">💡 老闆好！鎢絲燈泡到貨了</div>
+            <h2 style="color: #5D4037;">⚡ 閃電水電行 ⚡<br><span style="font-size: 16px; color: #8D6E63;">(傳統燈泡維修專門店)</span></h2>
             <p>今日有 3 位預約客戶，請準備營業！</p>
             <button class="btn-primary" onclick="startGame()">➔ 開始營業</button>
         </div>
 
+        <!-- 遊戲畫面 -->
         <div id="game-screen">
-            <div class="note-card">💡 <b>老闆隨身筆記：</b><br>● 電池並聯：體力變久 | ● 電池串聯：力量變強<br>● 燈泡並聯：各自亮亮 | ● 燈泡串聯：分電變暗</div>
+            <div class="note-card">
+                <span class="note-title">💡 老闆隨身筆記（傳統燈泡篇）：</span>
+                <div class="note-grid">
+                    <div class="note-item"><span class="note-dot">●</span>電池並聯：撐更久</div>
+                    <div class="note-item"><span class="note-dot">●</span>電池串聯：強更亮</div>
+                    <div class="note-item"><span class="note-dot">●</span>燈泡並聯：各自亮</div>
+                    <div class="note-item"><span class="note-dot">●</span>燈泡串聯：分電暗</div>
+                </div>
+            </div>
             <div class="order-sheet"><b id="cName"></b><p id="cDesc"></p></div>
+            
             <div style="text-align:left; background:#F5F5F5; padding:15px; border-radius:15px; margin-bottom:15px;">
-                電池接法：<select id="bat" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc;">
-                    <option value="串聯">串聯「一條龍」</option>
-                    <option value="並聯">並聯「排排站」</option>
+                電池接法：
+                <select id="bat">
+                    <option value="串聯">串聯「增加電壓」</option>
+                    <option value="並聯">並聯「增加電量」</option>
                 </select>
-                燈泡接法：<select id="bul" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc;">
-                    <option value="串聯">串聯「分著用」</option>
-                    <option value="並聯">並聯「自己用」</option>
+                傳統燈泡接法：
+                <select id="bul">
+                    <option value="串聯">串聯「平分亮度」</option>
+                    <option value="並聯">並聯「全力發光」</option>
                 </select>
             </div>
+            
             <button id="mainBtn" class="btn-primary" onclick="goWork()">確認派工！</button>
+            
             <div id="feedback">
-                <span id="starOutput" style="font-size: 30px;"></span>
-                <p id="msgOutput" style="font-weight:bold;"></p>
-                <button id="nextBtn" class="btn-primary" style="background:#8B4513;" onclick="nextStep()">下一位客人 ➔</button>
+                <span id="starOutput" style="font-size: 35px;"></span>
+                <p id="msgOutput" style="font-weight:bold; color: #E65100;"></p>
+                <button id="nextBtn" class="btn-primary" style="background:#5D4037; box-shadow: 0 4px #3E2723;" onclick="nextStep()">下一位客人 ➔</button>
             </div>
         </div>
 
+        <!-- 魔王挑戰、結算等畫面保持原本邏輯 -->
         <div id="boss-ask-screen">
-            <div style="font-size: 50px;">🔥</div>
+            <div style="font-size: 50px;">💡</div>
             <h2>隱藏挑戰出現！</h2>
-            <p style="background:#FFF3E0; padding:15px; border-radius:15px;">有個大客戶「超級歌手」指名要老闆處理演唱會電路，要挑戰嗎？</p>
+            <p style="background:#FFFDE7; padding:15px; border-radius:15px; border: 1px solid #FFF59D;">有個大客戶「超級歌手」指名要用數百顆<b>傳統鎢絲燈泡</b>佈置演唱會，要挑戰最高難度的配置嗎？</p>
             <button class="btn-primary btn-boss" onclick="startBoss()">🔥 接受挑戰 (魔王關)</button>
             <button class="btn-primary btn-skip" onclick="showEnd()">直接收工結算</button>
         </div>
@@ -66,31 +105,31 @@
             <h2 id="finalRank"></h2>
             <p>今日營業回顧：</p>
             <div id="reviewList" class="review-card"></div>
-            <button class="btn-primary" style="background:#546E7A;" onclick="location.reload()">重新開張</button>
+            <button class="btn-primary" style="background:#546E7A; box-shadow: 0 4px #37474F;" onclick="location.reload()">重新開張</button>
         </div>
     </div>
 
     <script>
-        // 核心邏輯資料庫
+        // 核心邏輯保持不變
         const missionDb = {
-            "阿嬤的鬧鐘": { logic: "電池並聯：增加總電量，跑更久。", target: { bat: "並聯" }, win: "「太專業了！」王阿嬤送你一包茶葉！", lose: "「老闆...鬧鐘兩天就停了。」" },
-            "小明的賽車": { logic: "電池串聯：疊加電壓，速度最快。", target: { bat: "串聯" }, win: "「衝啊！」小明拿了第一名！", lose: "「老闆，這速度慢死了...」" },
-            "陳伯伯": { logic: "燈泡並聯：各路徑獨立，不怕斷路。", target: { bul: "並聯" }, win: "「太安心了！」壞一顆另一顆仍亮。", lose: "「一顆燈壞全家黑，我差點絆倒。」" },
-            "林阿姨": { logic: "燈泡串聯：平分電壓，光線變柔和。", target: { bul: "串聯" }, win: "「就是這個光！」溫馨不刺眼。", lose: "「太亮了！眼睛快瞎了。」" },
-            "外送員阿強": { logic: "電池並聯：持久接法，亮整晚跑單。", target: { bat: "並聯" }, win: "「謝啦老闆！」跑宵夜場超放心。", lose: "「老闆，跑一半燈就熄了。」" },
-            "警衛大叔": { logic: "電池串聯：提高電壓讓光射更遠。", target: { bat: "串聯" }, win: "「太亮了！」連小貓都看得到。", lose: "「老闆，這光照不到十步遠。」" },
-            "科展同學": { logic: "燈泡串聯：分電變暗，符合實驗觀察。", target: { bul: "串聯" }, win: "「報告拿高分！」實驗結果非常正確。", lose: "「老闆，這亮度跟並聯一樣強？」" },
-            "演唱會歌手": { logic: "最強組合：電池串聯(增壓) + 燈泡並聯(最強亮度)。", target: { bat: "串聯", bul: "並聯" }, win: "「震撼全場！」最強光芒讓觀眾瘋狂！", middle: "「還可以，但總覺得能再精進？」", lose: "「這燈光微弱到像在過清明節？」" }
+            "阿嬤的鬧鐘": { logic: "電池並聯：增加總電量，讓設備跑更久。", target: { bat: "並聯" }, win: "「太專業了！」王阿嬤說鬧鐘很久沒換電池了！", lose: "「老闆...傳統電池一下子就沒電了。」" },
+            "小明的賽車": { logic: "電池串聯：疊加電壓，傳統馬達速度最快。", target: { bat: "串聯" }, win: "「衝啊！」小明的傳統馬達賽車跑第一！", lose: "「老闆，電壓不夠馬達轉不動啊...」" },
+            "陳伯伯": { logic: "傳統燈泡並聯：路徑獨立，燒斷一顆另一顆仍會亮。", target: { bul: "並聯" }, win: "「太安心了！」壞了一顆燈泡，走廊還是亮的。", lose: "「傳統燈泡串聯太危險，一顆壞掉全家變黑！」" },
+            "林阿姨": { logic: "傳統燈泡串聯：電壓被平分，光線柔和不刺眼。", target: { bul: "串聯" }, win: "「這就是黃光的溫馨感！」傳統燈泡變柔和了。", lose: "「傳統燈泡並聯太亮了！客廳像被閃光彈閃到。」" },
+            "外送員阿強": { logic: "電池並聯：增加續航力，讓傳統燈泡亮整晚。", target: { bat: "並聯" }, win: "「謝啦老闆！」傳統鎢絲燈亮一整晚也沒熄。", lose: "「老闆，跑一半傳統燈泡就沒電了。」" },
+            "警衛大叔": { logic: "電池串聯：提高電壓讓傳統手電筒射更遠。", target: { bat: "串聯" }, win: "「太亮了！」傳統手電筒發出強烈黃光！", lose: "「老闆，這光像燭火一樣微弱...」" },
+            "科展同學": { logic: "傳統燈泡串聯：電壓平分後亮度明顯變暗。", target: { bul: "串聯" }, win: "「數據正確！」精準觀察到傳統燈泡的變暗現象。", lose: "「老闆，這傳統燈泡亮度跟並聯一樣強？」" },
+            "演唱會歌手": { logic: "電池串聯(增壓) + 傳統燈泡並聯(最強亮度)。", target: { bat: "串聯", bul: "並聯" }, win: "「震撼全場！」上百顆鎢絲燈泡發出最強光芒！", middle: "「亮度普通，潛力沒被發揮？」", lose: "「這燈光昏暗到像在演恐怖片？」" }
         };
 
         const allClients = [
             { id: "阿嬤的鬧鐘", name: "王阿嬤", desc: "「鬧鐘電池很快就沒電，幫我撐久一點！」" },
             { id: "小明的賽車", name: "頑皮小明", desc: "「我的賽車速度慢死了，給我最強爆發力！」" },
-            { id: "陳伯伯", name: "陳伯伯", desc: "「裝兩顆燈泡，其中一顆壞掉另一顆不能熄！」" },
-            { id: "林阿姨", name: "林阿姨", desc: "「走廊燈太刺眼，能不能讓光線柔和一點？」" },
+            { id: "陳伯伯", name: "陳伯伯", desc: "「幫我裝兩顆傳統燈泡，壞一顆另一顆絕不能熄！」" },
+            { id: "林阿姨", name: "林阿姨", desc: "「傳統燈泡太刺眼了，能不能讓光線柔和一點？」" },
             { id: "外送員阿強", name: "外送員阿強", desc: "「外送箱的燈要亮很久，請幫我用最持久的接法！」" },
-            { id: "警衛大叔", name: "警衛大叔", desc: "「巡邏手電筒要射超遠，幫我加強電力！」" },
-            { id: "科展同學", name: "科展同學", desc: "「我想讓兩顆燈泡平分電壓變暗。」" }
+            { id: "警衛大叔", name: "警衛大叔", desc: "「巡邏手電筒要射超遠，幫我用傳統燈泡加強火力！」" },
+            { id: "科展同學", name: "科展同學", desc: "「我想實驗傳統燈泡如何平分電壓並變暗。」" }
         ];
 
         let clients = [], currentIdx = 0, score = 0, gameLog = [], isBossLevel = false;
@@ -111,7 +150,6 @@
             document.getElementById('mainBtn').innerText = "確認派工！";
         }
 
-        // 修正原本導致錯誤的 goWork 函式，現在不呼叫 google.script.run
         function goWork() {
             const batVal = document.getElementById('bat').value;
             const bulVal = document.getElementById('bul').value;
@@ -119,7 +157,7 @@
             const m = missionDb[currentId];
             
             document.getElementById('mainBtn').disabled = true;
-            document.getElementById('mainBtn').innerText = "工程處理中...";
+            document.getElementById('mainBtn').innerText = "鎢絲加熱處理中...";
 
             setTimeout(() => {
                 let isSuccess = false, star = "⭐", responseText = "";
@@ -157,7 +195,7 @@
 
         function startBoss() {
             isBossLevel = true;
-            clients.push({ id: "演唱會歌手", name: "隱藏魔王：演唱會歌手", desc: "「我要最強電壓搭配燈泡最高亮度，震撼全場！」" });
+            clients.push({ id: "演唱會歌手", name: "隱藏魔王：演唱會歌手", desc: "「我要傳統燈泡的最強亮點，給觀眾最震撼的視覺！」" });
             currentIdx = 3;
             document.getElementById('boss-ask-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
@@ -170,9 +208,9 @@
             document.getElementById('boss-ask-screen').style.display = 'none';
             document.getElementById('end-screen').style.display = 'block';
             
-            let rank = "熱血水電學徒";
-            if(score >= 4) rank = "🏆 閃電水電神之手";
-            else if(score >= 2) rank = "🥈 資深維修大師";
+            let rank = "傳統電路學徒";
+            if(score >= 4) rank = "🏆 閃電鎢絲燈大師";
+            else if(score >= 2) rank = "🥈 專業維修技師";
             
             document.getElementById('finalRank').innerText = rank;
             let html = "";
